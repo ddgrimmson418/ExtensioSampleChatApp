@@ -38,6 +38,7 @@ ChatEngine.on('$.ready', (data) => {
     let chat = new ChatEngine.Chat('new-chat');
 
     chat.on('$.connected', (payload) => {
+      $("#username").html('Welcome ' + me.uuid);
       appendMessage(me.uuid , 'Connected to chat!');
     });
 
