@@ -14,14 +14,19 @@ const getUsername = () => {
 };
 
 const appendMessage = (username, text) => {
-
-  let message =
+  let message;
+  if (username === "Status") {
+    message =
+    $(`<div class="text-center"/>`)
+    .append($(`<small>`).text(text));
+  } else {
+    message =
     $(`<div class="list-group-item" />`)
       .append($('<strong>').text(username + ': '))
       .append($('<span>').text(text));
-
-  $('#log').append(message);
-  $("#log").animate({ scrollTop: $('#log').prop("scrollHeight") }, "slow");
+    }
+    $('#log').append(message);
+    $("#log").animate({ scrollTop: $('#log').prop("scrollHeight") }, "slow");
 };
 
 const userNickName = getUsername();
@@ -52,7 +57,7 @@ ChatEngine.on('$.ready', (data) => {
 
     chat.on('$.connected', (payload) => {
       $("#username").html('Welcome ' + me.state.nickname);
-      appendMessage(me.state.nickname , 'Connected to chat!');
+      appendMessage("Status", me.state.nickname + ' Connected to chat!');
     });
 
     chat.on('$.online.here', (payload) => {
@@ -78,21 +83,28 @@ ChatEngine.on('$.ready', (data) => {
         $("#typingStatus").html('');
       }
     });
+    
+    sendMessage = () => {
+      const msg = $('#message').val();
+      if (msg) {
+        chat.emit('message', {
+          text: msg
+        });
+        $("#message").val('');
+      }
+    };
 
     $("#message").keypress(function(event) {
       chat.typingIndicator.startTyping();
       if (event.which == 13) {
-          chat.emit('message', {
-                  text: $('#message').val()
-          });
-          $("#message").val('');
+          sendMessage();
           chat.typingIndicator.stopTyping();
           event.preventDefault();
       }
     });
 
     chat.on("$.offline.*", (payload) => {
-      appendMessage("Status", "User " + payload.user.nickname + "left the channel!");
+      appendMessage("Status", "User " + payload.user.state.nickname + " left the channel!");
     });
     
     window.onbeforeunload = function() {
