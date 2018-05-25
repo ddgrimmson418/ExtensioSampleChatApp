@@ -8,14 +8,8 @@ let ChatEngine = ChatEngineCore.create({
 
 const getUsername = () => {
     const me = prompt("Enter Your Nickname");
-    return me
+    return me;
     
-};
-
-
-const getColor = () => {
-  const colors =   ["Red", "Orange", "Yellow", "Green", "Blue", "Purple", "Teal"];
-  return colors[Math.floor(Math.random() * colors.length)];
 };
 
 const appendMessage = (username, text) => {
@@ -29,29 +23,42 @@ const appendMessage = (username, text) => {
   $("#log").animate({ scrollTop: $('#log').prop("scrollHeight") }, "slow");
 };
 
-let me = ChatEngine.connect(getUsername(), {color: getColor()});
+const userNickName = getUsername();
+
+const uuid = userNickName.concat(Math.random().toString());
+
+let me = ChatEngine.connect(uuid, {nickname: userNickName});
 
 ChatEngine.on('$.ready', (data) => {
 
     let me = data.me;
 
+    changeNickname = () => {
+      const newNickName = getUsername();
+      const oldNickName = me.state.nickname;
+      me.update({
+        nickname: newNickName
+      });
+      $("#username").html('Welcome ' + me.state.nickname);
+    };
+
     let chat = new ChatEngine.Chat('new-chat');
 
     chat.on('$.connected', (payload) => {
-      $("#username").html('Welcome ' + me.uuid);
-      appendMessage(me.uuid , 'Connected to chat!');
+      $("#username").html('Welcome ' + me.state.nickname);
+      appendMessage(me.state.nickname , 'Connected to chat!');
     });
 
     chat.on('$.online.here', (payload) => {
-      appendMessage('Status', payload.user.uuid + ' is in the channel! Their color is ' + payload.user.state.color + '.');
+      appendMessage('Status', payload.user.state.nickname + ' is in the channel!');
     });
 
     chat.on('$.online.join', (payload) => {
-      appendMessage('Status', payload.user.uuid + ' has come online! Their color is ' + payload.user.state.color + '.');
+      appendMessage('Status', payload.user.state.nickname + ' has come online!');
     });
 
     chat.on('message', (payload) => {
-      appendMessage(payload.sender.uuid, payload.data.text);
+      appendMessage(payload.sender.state.nickname, payload.data.text);
     });
 
     $("#message").keypress(function(event) {
