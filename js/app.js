@@ -91,7 +91,7 @@ ChatEngine.on('$.ready', (data) => {
   });
 
   // Event Call back for typing indicator plugin to show the user typing in the chat window
-  chating.on('$typingIndicator.startTyping', (payload) => {
+  chat.on('$typingIndicator.startTyping', (payload) => {
     if (payload.sender.uuid !== me.uuid) {
       $('#typingStatus').html(payload.sender.state.nickname + ' is typing...');
     }
