@@ -60,7 +60,7 @@ ChatEngine.on('$.ready', (data) => {
   };
 
   // Creating the reference to an open chat room
-  let chat = new ChatEngine.Chat('personal-chat');
+  let chat = new ChatEngine.Chat('personal-chat-new');
 
   const config = {
     timeout: 1000
